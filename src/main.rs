@@ -178,6 +178,8 @@ async fn get_spotify_auth_token(
     Ok(auth_token.access_token)
 }
 
+use rand::seq::SliceRandom;
+
 async fn get_recommendations(
     client: &Client,
     username: &str,
@@ -186,17 +188,21 @@ async fn get_recommendations(
     let mut recommendations = Vec::new();
     let mut seen_artists = HashSet::new();
     
-    // Get top albums from last 6 months only
+    // Get top albums from last 6 months, increased limit to get more variety
     let url = format!(
-        "http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user={}&api_key={}&format=json&period=6month&limit=10",
+        "http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user={}&api_key={}&format=json&period=6month&limit=20",
         username, api_key
     );
     
     println!("📊 Fetching your top albums...");
     let top_albums: TopAlbums = client.get(&url).send().await?.json().await?;
     
+    // Shuffle the top albums
+    let mut albums = top_albums.topalbums.album;
+    albums.shuffle(&mut rand::thread_rng());
+    
     // Process each top artist
-    for album in &top_albums.topalbums.album {
+    for album in &albums {
         if seen_artists.contains(&album.artist.name) {
             continue;
         }
@@ -206,25 +212,34 @@ async fn get_recommendations(
         
         // Get similar artists
         let similar_url = format!(
-            "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist={}&api_key={}&format=json&limit=5",
+            "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist={}&api_key={}&format=json&limit=10", // Increased limit
             urlencoding::encode(&album.artist.name), api_key
         );
         
         if let Ok(similar) = client.get(&similar_url).send().await?.json::<SimilarArtists>().await {
-            // Get top album from each similar artist
-            for similar_artist in similar.similarartists.artist.iter().take(2) {
+            // Shuffle similar artists
+            let mut similar_artists = similar.similarartists.artist;
+            similar_artists.shuffle(&mut rand::thread_rng());
+            
+            // Get random albums from each similar artist
+            for similar_artist in similar_artists.iter().take(2) {
                 let artist_albums_url = format!(
-                    "http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist={}&api_key={}&format=json&limit=1",
+                    "http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist={}&api_key={}&format=json&limit=5", // Increased limit
                     urlencoding::encode(&similar_artist.name), api_key
                 );
                 
                 if let Ok(artist_albums) = client.get(&artist_albums_url).send().await?.json::<TopAlbums>().await {
-                    if let Some(top_album) = artist_albums.topalbums.album.first() {
-                        recommendations.push((similar_artist.name.clone(), top_album.name.clone()));
-                        println!("✓ Added recommendation: {} - {}", similar_artist.name, top_album.name);
-                        
-                        if recommendations.len() >= 10 {
-                            return Ok(recommendations);
+                    if !artist_albums.topalbums.album.is_empty() {
+                        // Get a random album instead of always the top one
+                        if let Some(random_album) = artist_albums.topalbums.album.choose(&mut rand::thread_rng()) {
+                            recommendations.push((similar_artist.name.clone(), random_album.name.clone()));
+                            println!("✓ Added recommendation: {} - {}", similar_artist.name, random_album.name);
+                            
+                            if recommendations.len() >= 10 {
+                                // Shuffle final recommendations
+                                recommendations.shuffle(&mut rand::thread_rng());
+                                return Ok(recommendations);
+                            }
                         }
                     }
                 }
@@ -232,6 +247,8 @@ async fn get_recommendations(
         }
     }
     
+    // Shuffle final recommendations before returning
+    recommendations.shuffle(&mut rand::thread_rng());
     Ok(recommendations)
 }
 
