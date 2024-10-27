@@ -91,8 +91,3 @@ chrono = "0.4"
 rand = "0.8"
 url = "2.4"
 ```
-
-## Contributing 🤝
-
-Please help test this out! 
-
