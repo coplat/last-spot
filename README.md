@@ -9,7 +9,7 @@ Last-Spot is a Rust application that creates personalized Spotify playlists base
 - Randomly selects recommendations for variety
 - Opens the playlist in your browser when done
 
-## Prerequisites 🛠️
+## Prerequisites 
 
 Before running Last-Spot, you'll need:
 
@@ -23,7 +23,7 @@ Before running Last-Spot, you'll need:
    - Get your Client ID and Client Secret
    - Add `http://localhost:8888/callback` to your Redirect URIs in the app settings
 
-## Installation 📦
+## Installation 
 
 1. Clone the repository:
 ```bash
@@ -45,7 +45,7 @@ SPOTIFY_USER_ID=your_spotify_username
 cargo build --release
 ```
 
-## Usage 🚀
+## Usage 
 
 Run the program:
 ```bash
@@ -60,7 +60,7 @@ The application will:
 5. Add discovered tracks to the playlist
 6. Open the playlist in your browser
 
-## How It Works 🔍
+## How ?
 
 1. **Last.fm Analysis:**
    - Fetches your top albums from the last 6 months
@@ -76,7 +76,7 @@ The application will:
    - Searches for each recommended track
    - Adds found tracks to the playlist
 
-## Dependencies 📚
+## Dependencies 
 
 ```toml
 [dependencies]
