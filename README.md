@@ -1,6 +1,6 @@
 # Last-Spot 🎵
 
-Last-Spot is a Rust application that creates personalized Spotify playlists based on your Last.fm listening history. It analyzes your top artists, finds similar artists you might enjoy, and automatically creates a Spotify playlist with their top tracks.
+Last-Spot is a Rust application that creates personalized Spotify playlists based on your Last.fm listening history. It analyzes your top artists, finds similar artists you might enjoy, and automatically creates a Spotify playlist with their top tracks you might not know!
 
 ## Features ✨
 - Analyzes your Last.fm listening history from the past 6 months
@@ -69,12 +69,10 @@ The application will:
 2. **Discovery:**
    - For each top artist, finds similar artists
    - Gets top albums from these similar artists
-   - Randomly selects tracks to ensure variety
+   - Randomly selects tracks to ensure variety from these albums
 
 3. **Spotify Integration:**
-   - Creates a new private playlist
-   - Searches for each recommended track
-   - Adds found tracks to the playlist
+   - Creates a new playlist with recommended tracks
 
 ## Dependencies 
 
