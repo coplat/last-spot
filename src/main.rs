@@ -212,7 +212,7 @@ async fn get_recommendations(
         
         // Get similar artists
         let similar_url = format!(
-            "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist={}&api_key={}&format=json&limit=10", // Increased limit
+            "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist={}&api_key={}&format=json&limit=10", 
             urlencoding::encode(&album.artist.name), api_key
         );
         
@@ -224,8 +224,7 @@ async fn get_recommendations(
             // Get random albums from each similar artist
             for similar_artist in similar_artists.iter().take(2) {
                 let artist_albums_url = format!(
-                    "http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist={}&api_key={}&format=json&limit=5", // Increased limit
-                    urlencoding::encode(&similar_artist.name), api_key
+                    "http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist={}&api_key={}&format=json&limit=5",                    urlencoding::encode(&similar_artist.name), api_key
                 );
                 
                 if let Ok(artist_albums) = client.get(&artist_albums_url).send().await?.json::<TopAlbums>().await {
